@@ -1,0 +1,13 @@
+#+TITLE:       Try new post
+#+AUTHOR:      tp
+#+EMAIL:       tp@ThinkPad
+#+DATE:        2018-06-19 Tue
+#+URI:         /blog/%y/%m/%d/try-new-post
+#+KEYWORDS:    aa,bb
+#+TAGS:        aa,bb
+#+LANGUAGE:    en
+#+OPTIONS:     H:3 num:nil toc:nil \n:nil ::t |:t ^:nil -:nil f:t *:t <:t
+#+DESCRIPTION: new new
+
+ttry try
+tyr
