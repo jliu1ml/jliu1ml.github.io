@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2018-06-19 Tue 12:54 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ideas and Math of Principal Component Analysis (PCA)</title>
+<meta name="generator" content="Org mode" />
+<meta name="author" content="tp" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { width: 90%; }
+  /*]]>*/-->
+</style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2017 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Ideas and Math of Principal Component Analysis (PCA)</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orga5f885c">1. Purpose of PCA</a></li>
+<li><a href="#orgf25ad09">2. Set-up</a></li>
+<li><a href="#orga9839b1">3. Idea flow</a></li>
+<li><a href="#org89351ce">4. Algorithm of PCA</a></li>
+<li><a href="#orgae2e6fc">5. Point of View from Linear Space</a></li>
+<li><a href="#orgf09afd8">Reference:</a></li>
+</ul>
+</div>
+</div>
+<p>
+;#+OPTIONS: tex:dvisvgm
+</p>
+
+<div id="outline-container-orga5f885c" class="outline-2">
+<h2 id="orga5f885c">1. Purpose of PCA</h2>
+<div class="outline-text-2" id="text-orga5f885c">
+<p>
+Reduce data's feature dimension from <b>m</b> to <b>r</b>, so that different components are un-correlated.
+For example, <img src="ltximg/PCA_bf7e5445e20536a3b4f45555f38d54460e128de4.png" alt="PCA_bf7e5445e20536a3b4f45555f38d54460e128de4.png" /> reduces dimension from <img src="ltximg/PCA_6af2bdb9886191d427ecb9fe876e2823ff08fcbd.png" alt="PCA_6af2bdb9886191d427ecb9fe876e2823ff08fcbd.png" /> to <img src="ltximg/PCA_a2c45382605dad1bbe197c64e8793aa68fe8b746.png" alt="PCA_a2c45382605dad1bbe197c64e8793aa68fe8b746.png" />.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgf25ad09" class="outline-2">
+<h2 id="orgf25ad09">2. Set-up</h2>
+<div class="outline-text-2" id="text-orgf25ad09">
+<ul class="org-ul">
+<li>Suppose that our data set includes <b>n</b> data points.</li>
+<li>We use a column vector with <b>m</b> entries to denote one data point with <b>m</b> features. Then the input of the PCA model is a <img src="ltximg/PCA_5ff59a0b399424a60c29190f621e78d977672031.png" alt="PCA_5ff59a0b399424a60c29190f621e78d977672031.png" /> matrix <b>X</b>.</li>
+<li>The feature dimension of one output data point is <b>r</b>. So the output of the PCA model is a <img src="ltximg/PCA_135aebf06fb16a3968245fdcf4c95ec5ee7d3fd8.png" alt="PCA_135aebf06fb16a3968245fdcf4c95ec5ee7d3fd8.png" /> matrix <b>Y</b>.</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orga9839b1" class="outline-2">
+<h2 id="orga9839b1">3. Idea flow</h2>
+<div class="outline-text-2" id="text-orga9839b1">
+<ul class="org-ul">
+<li>The PCA process is a map <img src="ltximg/PCA_ccb8f15715b8cd7a95e71b0216e00b229bb18b72.png" alt="PCA_ccb8f15715b8cd7a95e71b0216e00b229bb18b72.png" />; the easiest choice is to use a linear map <img src="ltximg/PCA_1714964c19dfa3ce7e608c5a0e11c5f2e97e4c07.png" alt="PCA_1714964c19dfa3ce7e608c5a0e11c5f2e97e4c07.png" /> to do the PCA through <img src="ltximg/PCA_37eae6aebc367d0e6e5d96530430fa2f791e69d4.png" alt="PCA_37eae6aebc367d0e6e5d96530430fa2f791e69d4.png" />.</li>
+<li>We want the features of <img src="ltximg/PCA_0314157cfda5ef7daff5d03747d9ab90365dfa75.png" alt="PCA_0314157cfda5ef7daff5d03747d9ab90365dfa75.png" /> be uncorrelated:
+<ol class="org-ol">
+<li><p>
+For convenience, we want each feature of <img src="ltximg/PCA_0314157cfda5ef7daff5d03747d9ab90365dfa75.png" alt="PCA_0314157cfda5ef7daff5d03747d9ab90365dfa75.png" /> has zero mean, which could be done if each feature of <img src="ltximg/PCA_b3005823fc1695124bed630f286c4885a2d8ed68.png" alt="PCA_b3005823fc1695124bed630f286c4885a2d8ed68.png" /> has zero mean. In fact, 
+</p>
+
+<div class="figure">
+<p><img src="ltximg/PCA_7df890328a2dc9b9b48daad2502f28d07c4c88ea.png" alt="PCA_7df890328a2dc9b9b48daad2502f28d07c4c88ea.png" /></p>
+</div>
+<p>
+So at the first step of PCA, we need to make features of <img src="ltximg/PCA_b3005823fc1695124bed630f286c4885a2d8ed68.png" alt="PCA_b3005823fc1695124bed630f286c4885a2d8ed68.png" /> be of zero mean. From now on, we assume that features of both <img src="ltximg/PCA_b3005823fc1695124bed630f286c4885a2d8ed68.png" alt="PCA_b3005823fc1695124bed630f286c4885a2d8ed68.png" /> and <img src="ltximg/PCA_0314157cfda5ef7daff5d03747d9ab90365dfa75.png" alt="PCA_0314157cfda5ef7daff5d03747d9ab90365dfa75.png" /> are of zero mean.
+</p></li>
+<li><p>
+Calculation of covariance matrix:
+</p>
+
+<div class="figure">
+<p><img src="ltximg/PCA_9c1014d811fcde7dbaee3c01e46c2395ee590102.png" alt="PCA_9c1014d811fcde7dbaee3c01e46c2395ee590102.png" /></p>
+</div>
+<p>
+In fact,
+</p>
+
+<div class="figure">
+<p><img src="ltximg/PCA_6e031752595ae4a5d473e63df3c3201ed08e1ce1.png" alt="PCA_6e031752595ae4a5d473e63df3c3201ed08e1ce1.png" /></p>
+</div></li>
+<li><p>
+Relation between <img src="ltximg/PCA_0600a7f39d50a007104641f3e1e95ff8bb0571fd.png" alt="PCA_0600a7f39d50a007104641f3e1e95ff8bb0571fd.png" /> and <img src="ltximg/PCA_42ecf333bb5f029f04ef314afca10d18fa021530.png" alt="PCA_42ecf333bb5f029f04ef314afca10d18fa021530.png" />:
+</p>
+
+<div class="figure">
+<p><img src="ltximg/PCA_13b00a7a7beb71be935dacf43e3fd22ef09fabb0.png" alt="PCA_13b00a7a7beb71be935dacf43e3fd22ef09fabb0.png" /></p>
+</div></li>
+<li>To make features of <img src="ltximg/PCA_0314157cfda5ef7daff5d03747d9ab90365dfa75.png" alt="PCA_0314157cfda5ef7daff5d03747d9ab90365dfa75.png" /> be uncorrelated, we just need to make <img src="ltximg/PCA_42ecf333bb5f029f04ef314afca10d18fa021530.png" alt="PCA_42ecf333bb5f029f04ef314afca10d18fa021530.png" /> be diagonal. By equation the above equation, we further just need to find the <img src="ltximg/PCA_f1bc6c3211eb256c80007b3c993901d46380e81b.png" alt="PCA_f1bc6c3211eb256c80007b3c993901d46380e81b.png" /> matrix <img src="ltximg/PCA_b6e6e96dd988b74ee3257baaf330ba3b1c8cec90.png" alt="PCA_b6e6e96dd988b74ee3257baaf330ba3b1c8cec90.png" /> so that <img src="ltximg/PCA_d185b7aacba70de74f57bc6affc0a6e312823312.png" alt="PCA_d185b7aacba70de74f57bc6affc0a6e312823312.png" /> is diagonal.</li>
+<li><p>
+Now, let's use the general method to diagonalize <img src="ltximg/PCA_0600a7f39d50a007104641f3e1e95ff8bb0571fd.png" alt="PCA_0600a7f39d50a007104641f3e1e95ff8bb0571fd.png" />. Since <img src="ltximg/PCA_e6b4c56e06872a0bacad2d17620cf0b720f02373.png" alt="PCA_e6b4c56e06872a0bacad2d17620cf0b720f02373.png" />, <img src="ltximg/PCA_0600a7f39d50a007104641f3e1e95ff8bb0571fd.png" alt="PCA_0600a7f39d50a007104641f3e1e95ff8bb0571fd.png" /> is a <img src="ltximg/PCA_941d9f39e1c9ec9b86e2275ea0be37ddcd43c13f.png" alt="PCA_941d9f39e1c9ec9b86e2275ea0be37ddcd43c13f.png" /> real symmetric matrix. So there exist an orthonormal matrix <img src="ltximg/PCA_ea45a72d6198d01595ebd823cb000925d151216f.png" alt="PCA_ea45a72d6198d01595ebd823cb000925d151216f.png" />, whose columns are formed by orthogonalized and normalized eigenvectors of <img src="ltximg/PCA_0600a7f39d50a007104641f3e1e95ff8bb0571fd.png" alt="PCA_0600a7f39d50a007104641f3e1e95ff8bb0571fd.png" />, such that
+</p>
+
+<div class="figure">
+<p><img src="ltximg/PCA_03425e9d2094b836fcc21fc9a8c3057ea5e3f4bd.png" alt="PCA_03425e9d2094b836fcc21fc9a8c3057ea5e3f4bd.png" /></p>
+</div>
+<p>
+where <img src="ltximg/PCA_de3ca5aa6fb3a34661561f9b6d2c82ae665b9026.png" alt="PCA_de3ca5aa6fb3a34661561f9b6d2c82ae665b9026.png" /> is an eigenvector of <img src="ltximg/PCA_2ca8b83fc58665d2bb18594b3b60e85e89fa85a6.png" alt="PCA_2ca8b83fc58665d2bb18594b3b60e85e89fa85a6.png" />.
+Take <img src="ltximg/PCA_b6e6e96dd988b74ee3257baaf330ba3b1c8cec90.png" alt="PCA_b6e6e96dd988b74ee3257baaf330ba3b1c8cec90.png" /> be the first <img src="ltximg/PCA_ba5b31845cc6bf3ffa00b499aa9e4b7ec6d165fb.png" alt="PCA_ba5b31845cc6bf3ffa00b499aa9e4b7ec6d165fb.png" /> rows of <img src="ltximg/PCA_81cbbebd4a691f9748dd269a9f6a9ca089a873b8.png" alt="PCA_81cbbebd4a691f9748dd269a9f6a9ca089a873b8.png" />, then <img src="ltximg/PCA_b6e6e96dd988b74ee3257baaf330ba3b1c8cec90.png" alt="PCA_b6e6e96dd988b74ee3257baaf330ba3b1c8cec90.png" /> is a <img src="ltximg/PCA_f1bc6c3211eb256c80007b3c993901d46380e81b.png" alt="PCA_f1bc6c3211eb256c80007b3c993901d46380e81b.png" /> matrix and 
+</p>
+
+<div class="figure">
+<p><img src="ltximg/PCA_6feb4fd4e2ca52bb57ab34b9f4815fc794c47762.png" alt="PCA_6feb4fd4e2ca52bb57ab34b9f4815fc794c47762.png" /></p>
+</div>
+<p>
+So
+</p>
+
+<div class="figure">
+<p><img src="ltximg/PCA_c9e544a97d1d1b772e2616988ada35de9ba63bc0.png" alt="PCA_c9e544a97d1d1b772e2616988ada35de9ba63bc0.png" /></p>
+</div></li>
+</ol></li>
+<li>Furthermore, for each feature of <img src="ltximg/PCA_0314157cfda5ef7daff5d03747d9ab90365dfa75.png" alt="PCA_0314157cfda5ef7daff5d03747d9ab90365dfa75.png" />, we want the variance over different data points be large, so that the data set contributes more information. By the above equation, we know that the variances of features of <img src="ltximg/PCA_0314157cfda5ef7daff5d03747d9ab90365dfa75.png" alt="PCA_0314157cfda5ef7daff5d03747d9ab90365dfa75.png" /> are just eigenvalues <img src="ltximg/PCA_f4a3874a06ee41dc0d0a673fd6012722495c1d4a.png" alt="PCA_f4a3874a06ee41dc0d0a673fd6012722495c1d4a.png" />, so we just need to order the eigenvalues from larger ones to smaller ones when finding <img src="ltximg/PCA_ea45a72d6198d01595ebd823cb000925d151216f.png" alt="PCA_ea45a72d6198d01595ebd823cb000925d151216f.png" />.</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org89351ce" class="outline-2">
+<h2 id="org89351ce">4. Algorithm of PCA</h2>
+<div class="outline-text-2" id="text-org89351ce">
+<ol class="org-ol">
+<li>Format the data (<img src="ltximg/PCA_c599b3f20c0a76b55e8615a8389a50c6fa5950dc.png" alt="PCA_c599b3f20c0a76b55e8615a8389a50c6fa5950dc.png" /> data points with <img src="ltximg/PCA_0a216cf4699a1989db96742ee7fcae3253073beb.png" alt="PCA_0a216cf4699a1989db96742ee7fcae3253073beb.png" /> features) as a <img src="ltximg/PCA_5ff59a0b399424a60c29190f621e78d977672031.png" alt="PCA_5ff59a0b399424a60c29190f621e78d977672031.png" /> matrix <img src="ltximg/PCA_b3005823fc1695124bed630f286c4885a2d8ed68.png" alt="PCA_b3005823fc1695124bed630f286c4885a2d8ed68.png" />.</li>
+<li>For each row of <img src="ltximg/PCA_b3005823fc1695124bed630f286c4885a2d8ed68.png" alt="PCA_b3005823fc1695124bed630f286c4885a2d8ed68.png" />, substract the row mean from each entry.</li>
+<li>Calculate the covariance matrix <img src="ltximg/PCA_e6b4c56e06872a0bacad2d17620cf0b720f02373.png" alt="PCA_e6b4c56e06872a0bacad2d17620cf0b720f02373.png" />.</li>
+<li>Calculate the eigenvalues and eigenvectors of <img src="ltximg/PCA_0600a7f39d50a007104641f3e1e95ff8bb0571fd.png" alt="PCA_0600a7f39d50a007104641f3e1e95ff8bb0571fd.png" />. Orthogonalize and normalize the eigenvectors; then use them to form the columns of the othornomal matrix <img src="ltximg/PCA_ea45a72d6198d01595ebd823cb000925d151216f.png" alt="PCA_ea45a72d6198d01595ebd823cb000925d151216f.png" /> for diagonalizing <img src="ltximg/PCA_0600a7f39d50a007104641f3e1e95ff8bb0571fd.png" alt="PCA_0600a7f39d50a007104641f3e1e95ff8bb0571fd.png" />, with eigenvalues listed from larger ones to smaller ones.</li>
+<li>Take the first <img src="ltximg/PCA_ba5b31845cc6bf3ffa00b499aa9e4b7ec6d165fb.png" alt="PCA_ba5b31845cc6bf3ffa00b499aa9e4b7ec6d165fb.png" /> rows of <img src="ltximg/PCA_e0cc2a4bf9ba0db874916772eceb2130763a0575.png" alt="PCA_e0cc2a4bf9ba0db874916772eceb2130763a0575.png" /> to be <img src="ltximg/PCA_b6e6e96dd988b74ee3257baaf330ba3b1c8cec90.png" alt="PCA_b6e6e96dd988b74ee3257baaf330ba3b1c8cec90.png" />.</li>
+<li><img src="ltximg/PCA_300f98a24b9b7dd7e33156ecf7e81ea54291e44e.png" alt="PCA_300f98a24b9b7dd7e33156ecf7e81ea54291e44e.png" /> is the data we want after doing PCA.</li>
+</ol>
+</div>
+</div>
+
+<div id="outline-container-orgae2e6fc" class="outline-2">
+<h2 id="orgae2e6fc">5. Point of View from Linear Space</h2>
+</div>
+
+
+<div id="outline-container-orgf09afd8" class="outline-2">
+<h2 id="orgf09afd8">Reference:</h2>
+<div class="outline-text-2" id="text-orgf09afd8">
+<p>
+<a href="http://blog.codinglabs.org/articles/pca-tutorial.html">http://blog.codinglabs.org/articles/pca-tutorial.html</a>
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: tp</p>
+<p class="date">Created: 2018-06-19 Tue 12:54</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>
