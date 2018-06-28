@@ -32,9 +32,9 @@
 <div class="post">
 <h1>Ideas and Math of Principal Component Analysis (PCA)</h1>
 
-<div id="outline-container-org90dcbd1" class="outline-2">
-<h2 id="org90dcbd1">1. Purpose of PCA</h2>
-<div class="outline-text-2" id="text-org90dcbd1">
+<div id="outline-container-orgc938da4" class="outline-2">
+<h2 id="orgc938da4">1. Purpose of PCA</h2>
+<div class="outline-text-2" id="text-orgc938da4">
 <p>
 Reduce data's feature dimension from <b>m</b> to <b>r</b>, so that different components are un-correlated.
 For example, \([S,\sigma, \mu, -\mu, 2\sigma]^{T}\rightarrow [S,\sigma, \mu]^{T}\) reduces dimension from \(m=5\) to \(r=3\).
@@ -42,9 +42,9 @@ For example, \([S,\sigma, \mu, -\mu, 2\sigma]^{T}\rightarrow [S,\sigma, \mu]^{T}
 </div>
 </div>
 
-<div id="outline-container-org084aca5" class="outline-2">
-<h2 id="org084aca5">2. Set-up</h2>
-<div class="outline-text-2" id="text-org084aca5">
+<div id="outline-container-org46125c0" class="outline-2">
+<h2 id="org46125c0">2. Set-up</h2>
+<div class="outline-text-2" id="text-org46125c0">
 <ul class="org-ul">
 <li>Suppose that our data set includes <b>n</b> data points.</li>
 <li>We use a column vector with <b>m</b> entries to denote one data point with <b>m</b> features. Then the input of the PCA model is a \(m\times n\) matrix <b>X</b>.</li>
@@ -53,9 +53,9 @@ For example, \([S,\sigma, \mu, -\mu, 2\sigma]^{T}\rightarrow [S,\sigma, \mu]^{T}
 </div>
 </div>
 
-<div id="outline-container-org56f0952" class="outline-2">
-<h2 id="org56f0952">3. Idea flow</h2>
-<div class="outline-text-2" id="text-org56f0952">
+<div id="outline-container-orgd66179e" class="outline-2">
+<h2 id="orgd66179e">3. Idea flow</h2>
+<div class="outline-text-2" id="text-orgd66179e">
 <ul class="org-ul">
 <li>The PCA process is a map \(X\in\mathbb{R}^{m\times n}\rightarrow Y\in \mathbb{R}^{r\times n}\); the easiest choice is to use a linear map \(P\in \mathbb{R}^{r\times m}\) to do the PCA through \(PX=Y\).</li>
 <li>We want the features of \(Y\) be uncorrelated:
@@ -124,9 +124,9 @@ COV[Y]= P\ \text{COV}[X]P^{T}=\text{diag} \left\{\lambda_1,\cdots,\lambda_{r} \r
 </div>
 </div>
 
-<div id="outline-container-orge2b3d66" class="outline-2">
-<h2 id="orge2b3d66">4. Algorithm of PCA</h2>
-<div class="outline-text-2" id="text-orge2b3d66">
+<div id="outline-container-orgd393392" class="outline-2">
+<h2 id="orgd393392">4. Algorithm of PCA</h2>
+<div class="outline-text-2" id="text-orgd393392">
 <ol class="org-ol">
 <li>Format the data (\(n\) data points with \(m\) features) as a \(m\times n\) matrix \(X\).</li>
 <li>For each row of \(X\), subtract the row mean from each entry.</li>
@@ -138,9 +138,9 @@ COV[Y]= P\ \text{COV}[X]P^{T}=\text{diag} \left\{\lambda_1,\cdots,\lambda_{r} \r
 </div>
 </div>
 
-<div id="outline-container-org3ff74bb" class="outline-2">
-<h2 id="org3ff74bb">5. Point of View from Linear Space</h2>
-<div class="outline-text-2" id="text-org3ff74bb">
+<div id="outline-container-orgfb94dd5" class="outline-2">
+<h2 id="orgfb94dd5">5. Point of View from Linear Space</h2>
+<div class="outline-text-2" id="text-orgfb94dd5">
 <ul class="org-ul">
 <li>From the point of view from linear space, the linear map \(P=Q^T\) is just a change of basis. In fact,</li>
 </ul>
@@ -196,9 +196,9 @@ Therefore, the output points are just coordinates of \(X\) under the new basis f
 
 
 
-<div id="outline-container-org2219962" class="outline-2">
-<h2 id="org2219962">Reference:</h2>
-<div class="outline-text-2" id="text-org2219962">
+<div id="outline-container-org80a7435" class="outline-2">
+<h2 id="org80a7435">Reference:</h2>
+<div class="outline-text-2" id="text-org80a7435">
 <p>
 <a href="http://blog.codinglabs.org/articles/pca-tutorial.html">http://blog.codinglabs.org/articles/pca-tutorial.html</a>
 </p>
