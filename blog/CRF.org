@@ -4,8 +4,8 @@
 
 #+TITLE: Understand of the forward and backward vectors for liner Conditional Random Field (CRF)
 #+AUTHOR:      Jing Liu
-#+DATE:        2018-06-28 Thu
-#+URI:         /blog/%y/%m/%d/pca
+#+DATE:        2018-06-27 Wed
+#+URI:         /blog/%y/%m/%d/crf
 #+KEYWORDS:    CRF, idea, Math
 #+TAGS:        :Machine_Learning
 #+LANGUAGE:    en
