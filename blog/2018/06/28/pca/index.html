@@ -18,7 +18,7 @@
           <li><a href="/blog/">Blog</a></li>
           <li><a href="/tags/">Tags</a></li>
           <li><a href="/about/">About</a></li>
-          <li><a href="https://github.com/kelvinh/org-page">GitHub</a></li>
+          <li><a href="https://github.com/jliu1ml">GitHub</a></li>
           <li><a href="/rss.xml">RSS</a></li>
         </ul>
         <form method="get" id="searchform" action="//www.google.com/search">
@@ -32,9 +32,9 @@
 <div class="post">
 <h1>Ideas and Math of Principal Component Analysis (PCA)</h1>
 
-<div id="outline-container-org790975d" class="outline-2">
-<h2 id="org790975d">1. Purpose of PCA</h2>
-<div class="outline-text-2" id="text-org790975d">
+<div id="outline-container-org23379b4" class="outline-2">
+<h2 id="org23379b4">1. Purpose of PCA</h2>
+<div class="outline-text-2" id="text-org23379b4">
 <p>
 Reduce data's feature dimension from <b>m</b> to <b>r</b>, so that different components are un-correlated.
 For example, \([S,\sigma, \mu, -\mu, 2\sigma]^{T}\rightarrow [S,\sigma, \mu]^{T}\) reduces dimension from \(m=5\) to \(r=3\).
@@ -42,9 +42,9 @@ For example, \([S,\sigma, \mu, -\mu, 2\sigma]^{T}\rightarrow [S,\sigma, \mu]^{T}
 </div>
 </div>
 
-<div id="outline-container-org86451d6" class="outline-2">
-<h2 id="org86451d6">2. Set-up</h2>
-<div class="outline-text-2" id="text-org86451d6">
+<div id="outline-container-orgcba3eb0" class="outline-2">
+<h2 id="orgcba3eb0">2. Set-up</h2>
+<div class="outline-text-2" id="text-orgcba3eb0">
 <ul class="org-ul">
 <li>Suppose that our data set includes <b>n</b> data points.</li>
 <li>We use a column vector with <b>m</b> entries to denote one data point with <b>m</b> features. Then the input of the PCA model is a \(m\times n\) matrix <b>X</b>.</li>
@@ -53,9 +53,9 @@ For example, \([S,\sigma, \mu, -\mu, 2\sigma]^{T}\rightarrow [S,\sigma, \mu]^{T}
 </div>
 </div>
 
-<div id="outline-container-org40fc968" class="outline-2">
-<h2 id="org40fc968">3. Idea flow</h2>
-<div class="outline-text-2" id="text-org40fc968">
+<div id="outline-container-orgc6842f1" class="outline-2">
+<h2 id="orgc6842f1">3. Idea flow</h2>
+<div class="outline-text-2" id="text-orgc6842f1">
 <ul class="org-ul">
 <li>The PCA process is a map \(X\in\mathbb{R}^{m\times n}\rightarrow Y\in \mathbb{R}^{r\times n}\); the easiest choice is to use a linear map \(P\in \mathbb{R}^{r\times m}\) to do the PCA through \(PX=Y\).</li>
 <li>We want the features of \(Y\) be uncorrelated:
@@ -124,9 +124,9 @@ COV[Y]= P\ \text{COV}[X]P^{T}=\text{diag} \left\{\lambda_1,\cdots,\lambda_{r} \r
 </div>
 </div>
 
-<div id="outline-container-org63c49bf" class="outline-2">
-<h2 id="org63c49bf">4. Algorithm of PCA</h2>
-<div class="outline-text-2" id="text-org63c49bf">
+<div id="outline-container-org64d26c6" class="outline-2">
+<h2 id="org64d26c6">4. Algorithm of PCA</h2>
+<div class="outline-text-2" id="text-org64d26c6">
 <ol class="org-ol">
 <li>Format the data (\(n\) data points with \(m\) features) as a \(m\times n\) matrix \(X\).</li>
 <li>For each row of \(X\), subtract the row mean from each entry.</li>
@@ -138,9 +138,9 @@ COV[Y]= P\ \text{COV}[X]P^{T}=\text{diag} \left\{\lambda_1,\cdots,\lambda_{r} \r
 </div>
 </div>
 
-<div id="outline-container-orgb15c0bf" class="outline-2">
-<h2 id="orgb15c0bf">5. Point of View from Linear Space</h2>
-<div class="outline-text-2" id="text-orgb15c0bf">
+<div id="outline-container-orga0e68d9" class="outline-2">
+<h2 id="orga0e68d9">5. Point of View from Linear Space</h2>
+<div class="outline-text-2" id="text-orga0e68d9">
 <ul class="org-ul">
 <li>From the point of view from linear space, the linear map \(P=Q^T\) is just a change of basis. In fact,</li>
 </ul>
@@ -196,9 +196,9 @@ Therefore, the output points are just coordinates of \(X\) under the new basis f
 
 
 
-<div id="outline-container-org0730ab0" class="outline-2">
-<h2 id="org0730ab0">Reference:</h2>
-<div class="outline-text-2" id="text-org0730ab0">
+<div id="outline-container-orgad19f63" class="outline-2">
+<h2 id="orgad19f63">Reference:</h2>
+<div class="outline-text-2" id="text-orgad19f63">
 <p>
 <a href="http://blog.codinglabs.org/articles/pca-tutorial.html">http://blog.codinglabs.org/articles/pca-tutorial.html</a>
 </p>
