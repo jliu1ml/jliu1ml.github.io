@@ -5,11 +5,11 @@
 #+OPTIONS: num:nil
 
 #+TITLE: Ideas and Math of Principal Component Analysis (PCA)
-#+AUTHOR:      tp
+#+AUTHOR:      Jing Liu
 #+DATE:        2018-06-28 Thu
 #+URI:         /blog/%y/%m/%d/pca
-#+KEYWORDS:    <TODO: insert your keywords here>
-#+TAGS:        <TODO: insert your tags here>
+#+KEYWORDS:    PCA, idea, Math
+#+TAGS:        :Machine_Learning
 #+LANGUAGE:    en
 #+OPTIONS:     H:3 num:nil toc:nil \n:nil ::t |:t ^:nil -:nil f:t *:t <:t
 #+DESCRIPTION: <TODO: insert your description here>
