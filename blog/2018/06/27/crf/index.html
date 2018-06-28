@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <title>Understand of the forward and backward vectors for liner Conditional Random Field (CRF) - Jing Liu</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Jing Liu" />
+    <meta name="description" content="&lt;TODO: insert your description here&gt;" />
+    <meta name="keywords" content="CRF, idea, Math" />
+    <link rel="stylesheet" href="/media/css/main.css" type="text/css">
+    <link rel="stylesheet" href="/media/css/prettify.css" type="text/css">
+  </head>
+  <body class="container">
+    <div>
+      <header class="masthead">
+        <h1 class="masthead-title"><a href="/">Jing Liu</a></h1>
+        <p>Machine Learning + Financial Mathematics</p>
+        <ul>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/tags/">Tags</a></li>
+          <li><a href="/about/">About</a></li>
+          <li><a href="https://github.com/jliu1ml">GitHub</a></li>
+          <li><a href="/rss.xml">RSS</a></li>
+        </ul>
+        <form method="get" id="searchform" action="//www.google.com/search">
+          <input type="text" class="field" name="q" id="s" placeholder="Search">
+          <input type="hidden" name="as_sitesearch" value="jliu1ml.github.io">
+        </form>
+      </header>
+    </div>
+
+<div>
+<div class="post">
+<h1>Understand of the forward and backward vectors for liner Conditional Random Field (CRF)</h1>
+
+<div id="outline-container-org1a739ad" class="outline-2">
+<h2 id="org1a739ad">Linear Conditional Random Field (Liner CRF)</h2>
+<div class="outline-text-2" id="text-org1a739ad">
+<p>
+Condition random field is a probability distribution \(P(Y|X)\) corresponding to an undirected graph \(G=(V,E)\), which under the given condition \(X\), each node \(Y_{v}\) only depends on the nodes connected to \(v\). A linear CRF is the special case when the undirected graph is a chain. Note that the linear CRF is to some degree an extension of the Hidden Markov Model (HMM): in HMM, conditioned on \(X\), \(Y_{i}\) only depends on \(Y_{i-1}\); while in CRF, conditioned on \(X\), \(Y_i\) depends on both \(Y_{i-1}\) and \(Y_{i+1}\). This is also why it's called a random field, but not a stochastic process; because it's not a time sequence, but has spatial feather.
+</p>
+
+<p>
+For linear CRF, since each  \(Y_i\) depends on both \(Y_{i-1}\) and \(Y_{i+1}\), conditioned on \(X\), we can write the distribution as
+</p>
+\begin{align*}
+  P_w(y|x)&=\frac{1}{Z_w(x)}\exp \sum_{i=1}^{n+1} \sum_{k=1}^K w_k
+  f_k(y_{i-1}, y_i, x, i)\\
+          &= \frac{1}{Z_w(x)} \exp \sum_{i=1}^{n+1} W_i(y_{i-1},
+            y_i|x) = \frac{1}{Z_x(x)} \Pi_{i=1}^n \exp W_i(y_{i-1},
+            y_i | x)\\
+  &= \frac{1}{Z_w(x)} \Pi_{i=1}^{n+1} M(y_{i-1}, y_i|x),
+\end{align*}
+<p>
+where \(i\) explores all the nodes in the graph, while \(k\) labels feathers describing the conditional dependency, and \(Z_{w}\) is the normalizer:
+</p>
+\begin{align*}
+  Z_w(x) = \sum_{\text{all possible }y_1,y_2,\cdots,y_n}
+  \frac{1}{Z_w(x)} \Pi_{i=1}^{n+1} M(y_{i-1},
+  y_i|x)=(M_1(x)M_2(x)\cdots M_{n+1}(x))_{\text{start, stop}},
+\end{align*}
+<p>
+where \(M_i(x)=[M_i(y_{i-1},y_i|x)]_{m\times m}\), \(m=|Y|\) is the number of values of \(y\), \(y_0=\text{start}\), \(y_{n+1}=\text{stop}\). 
+</p>
+
+<p>
+<b>Remark.</b> Here \(M\) is not a probability transition matrix, because \(Y_i\) depends on both \(Y_{i-1}\) and \(Y_{i+1}\) (conditioned on \(X\)).
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgff7e9a9" class="outline-2">
+<h2 id="orgff7e9a9">Forward and Backward vectors</h2>
+<div class="outline-text-2" id="text-orgff7e9a9">
+<p>
+Forward and backward vectors can make the computation of conditional probabilities at each node very easy. The idea may comes from the similar terms in Hidden Markov Model. However, for HMM, since \(Y_{i}\) only depends on \(Y_{i-1}\) (conditioned on \(X\)), forward and backward probabilities can be clearly defined; but for CRF, since \(Y_i\) depends on both \(Y_{i-1}\) and \(Y_{i+1}\) (conditioned on \(X\)), we can only have forward <b>vectors</b> and backward <b>vectors</b>, which are just formal definitions which looks like probablities but actually not.
+</p>
+
+<p>
+Denote the \(m\) possible values of \(y\) by \(y^{(1)}, y^{(2)}, \cdots, y^{(m)}\).
+</p>
+</div>
+
+<div id="outline-container-org6a7f21e" class="outline-3">
+<h3 id="org6a7f21e">Forward vectors</h3>
+<div class="outline-text-3" id="text-org6a7f21e">
+<p>
+The forward vectors \(\alpha_i(x)=[\alpha_i(y^{(1)}|x), \alpha_i(y^{(2)}|x),\cdots,\alpha_i(y^{(m)}|x)]^T\) are defined by:
+</p>
+\begin{align*}
+\alpha_0(y_{0}|x)=\mathbf{1}_{\{ y_0=\text{start}  \}},\ \alpha^T_i(x)=\alpha^{T}_{i-1}(x) M_i(x).
+\end{align*}
+<p>
+With this definition and by induction, we have
+</p>
+\begin{align*}
+  \alpha_i(y_i|x)&=\sum_{y_{i-1}}\alpha_{i-1}(y_{i-1}|x)M_i(y_{i-1},y_i|x)\\
+  &=\sum_{y_1,y_2,\cdots,y_{i-1}} \Pi^i_{j=1}M_j(y_{j-1},y_j|x).
+\end{align*}
+<p>
+Formaly, if we take for granted that \(Y_{i}\) only depends on \(Y_{i-1}\) (forward direction), then \(M\) looks like the probability transition matrix and \(\alpha\) looks like the forward probability. Though this is not true in general, we can use this intuition to help thinking. Moreover, we will see in next part that this kind of forward <span class="underline">vector</span> is very useful when compute the conditional <span class="underline">probability</span> at one node.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org4ee5501" class="outline-3">
+<h3 id="org4ee5501">backward vectors</h3>
+<div class="outline-text-3" id="text-org4ee5501">
+<p>
+The backward vectors \(\beta_i(x)=\left[ \beta_i(y^{(1)}|x), \beta_i(y^{(2)}|x), \cdots, \beta_i(y^{(m)}|x) \right]^T\)
+are defined by
+</p>
+\begin{align*}
+  \beta_{n+1}(y_{n+1}|x)=\mathbf{1}_{\{ y_{n+1}=\text{stop}  \}},\ \beta_i=M_{i+1}(x) \beta_{i+1}(x).
+\end{align*}
+<p>
+With this definition and by induction, we have
+</p>
+\begin{align*}
+\beta_i(y_i|x)&=\sum_{y_{i+1}} M_{i+1}(y_i,y_{i+1}|x)
+  \beta_{i+1}(y_{i+1}|x)\\
+  &=\sum_{y_{i+1},y_{i+2}, \cdots,y_n} \Pi_{j=i+1}^{n+1}  M_{j+1}(y_j,y_{j+1}|x).
+\end{align*}
+</div>
+</div>
+</div>
+
+<div id="outline-container-org0fa1751" class="outline-2">
+<h2 id="org0fa1751">Conditional Probability</h2>
+<div class="outline-text-2" id="text-org0fa1751">
+<p>
+As discussed above, forward and backward vectors looks very similar to the forward and backward probabilities and \(M\) looks very similar to the probability transition matrix, even though they are in general not. But, for computation of the conditional probability, they works. Neither the forward \(\alpha\) and the backward \(\beta\) are probabilities, but when taking the multiplicatin of them, we will obtain the conditional probability!
+</p>
+\begin{align*}
+  \mathbb{P}(Y_i=y_i|x) &=  \sum_{\substack{\text{all possible} \\
+  y_{1},y_2,\cdots,y_{i-1}, \\ y_{i+1},\cdots,y_{n}}} \Pi_{j=1}^{n+1}
+  M_j(y_{j-1},y_j|x) \frac{1}{Z(x)}\\
+  &= \frac{1}{Z(x)} \sum_{\substack{\text{all possible} \\
+  y_{1},y_2,\cdots,y_{i-1}, \\ y_{i+1},\cdots,y_{n}}}  \Pi_{j=1}^{i}
+  M_j(y_{j-1},y_j|x)  \Pi_{j=i+1}^{n+1}
+  M_j(y_{j-1},y_j|x) \\
+  &= \left( \sum_{\substack{\text{all possible} \\
+  y_{1},y_2,\cdots,y_{i-1}}}  \Pi_{j=1}^{i}
+  M_j(y_{j-1},y_j|x)   \right)\left( \sum_{\substack{\text{all possible} \\
+  y_{i+1},\cdots,y_{n}}}  \Pi_{j=i+1}^{n}
+  M_j(y_{j-1},y_j|x)   \right)\frac{1}{Z(x)}\\
+  &=\alpha_i(y_i|x)\beta_i(y_i|x)\frac{1}{Z(x)}
+\end{align*}
+<p>
+The second to the last equality is very magic and important! It uses the idea of combinatorics over sum of production.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org3137b43" class="outline-2">
+<h2 id="org3137b43">Reference</h2>
+<div class="outline-text-2" id="text-org3137b43">
+<p>
+Hang Li, Statistical Learning Method.
+</p>
+</div>
+</div>
+
+</div>
+</div>
+    <div>
+      <div class="post-meta">
+        <span title="post date" class="post-info">2018-06-27</span>
+        <span title="last modification date" class="post-info">2018-06-28</span>
+        <span title="tags" class="post-info"><a href="/tags/machine_learning/">Machine_Learning</a></span>
+        <span title="author" class="post-info">Jing Liu</span>
+      </div>
+      <section>
+        <h1>Comments</h1>
+      </section>
+      <script src="//code.jquery.com/jquery-latest.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.js"></script>
+      <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script src="/media/js/main.js"></script>
+      <div class="footer">
+        <p>Generated by <a href="http://www.gnu.org/software/emacs/">Emacs</a> 25.x (<a href="http://orgmode.org">Org mode</a> 9.x)</p>
+        <p>
+          Copyright &copy; 2012 - <span id="footerYear"></span> <a href="mailto:tp &lt;at&gt; ThinkPad">Jing Liu</a>
+          &nbsp;&nbsp;-&nbsp;&nbsp;
+          Powered by <a href="https://github.com/kelvinh/org-page" target="_blank">org-page</a>
+          <script type="text/javascript">document.getElementById("footerYear").innerHTML = (new Date()).getFullYear();</script>
+        </p>
+      </div>
+    </div>
+
+  </body>
+</html>
