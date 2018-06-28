@@ -1,0 +1,90 @@
+#+STARTUP: content
+#+OPTIONS: ^:nil
+#+OPTIONS: num:nil
+
+#+TITLE: Understand of the forward and backward vectors for liner Conditional Random Field (CRF)
+#+AUTHOR:      Jing Liu
+#+DATE:        2018-06-28 Thu
+#+URI:         /blog/%y/%m/%d/pca
+#+KEYWORDS:    CRF, idea, Math
+#+TAGS:        :Machine_Learning
+#+LANGUAGE:    en
+#+OPTIONS:     H:3 num:nil toc:nil \n:nil ::t |:t ^:nil -:nil f:t *:t <:t
+#+DESCRIPTION: <TODO: insert your description here>
+
+* Linear Conditional Random Field (Liner CRF)
+Condition random field is a probability distribution $P(Y|X)$ corresponding to an undirected graph $G=(V,E)$, which under the given condition $X$, each node $Y_{v}$ only depends on the nodes connected to $v$. A linear CRF is the special case when the undirected graph is a chain. Note that the linear CRF is to some degree an extension of the Hidden Markov Model (HMM): in HMM, conditioned on $X$, $Y_{i}$ only depends on $Y_{i-1}$; while in CRF, conditioned on $X$, $Y_i$ depends on both $Y_{i-1}$ and $Y_{i+1}$. This is also why it's called a random field, but not a stochastic process; because it's not a time sequence, but has spatial feather.
+
+For linear CRF, since each  $Y_i$ depends on both $Y_{i-1}$ and $Y_{i+1}$, conditioned on $X$, we can write the distribution as
+\begin{align*}
+  P_w(y|x)&=\frac{1}{Z_w(x)}\exp \sum_{i=1}^{n+1} \sum_{k=1}^K w_k
+  f_k(y_{i-1}, y_i, x, i)\\
+          &= \frac{1}{Z_w(x)} \exp \sum_{i=1}^{n+1} W_i(y_{i-1},
+            y_i|x) = \frac{1}{Z_x(x)} \Pi_{i=1}^n \exp W_i(y_{i-1},
+            y_i | x)\\
+  &= \frac{1}{Z_w(x)} \Pi_{i=1}^{n+1} M(y_{i-1}, y_i|x),
+\end{align*}
+where $i$ explores all the nodes in the graph, while $k$ labels feathers describing the conditional dependency, and $Z_{w}$ is the normalizer:
+\begin{align*}
+  Z_w(x) = \sum_{\text{all possible }y_1,y_2,\cdots,y_n}
+  \frac{1}{Z_w(x)} \Pi_{i=1}^{n+1} M(y_{i-1},
+  y_i|x)=(M_1(x)M_2(x)\cdots M_{n+1}(x))_{\text{start, stop}},
+\end{align*}
+where $M_i(x)=[M_i(y_{i-1},y_i|x)]_{m\times m}$, $m=|Y|$ is the number of values of $y$, $y_0=\text{start}$, $y_{n+1}=\text{stop}$. 
+
+*Remark.* Here $M$ is not a probability transition matrix, because $Y_i$ depends on both $Y_{i-1}$ and $Y_{i+1}$ (conditioned on $X$).
+
+* Forward and Backward vectors
+
+Forward and backward vectors can make the computation of conditional probabilities at each node very easy. The idea may comes from the similar terms in Hidden Markov Model. However, for HMM, since $Y_{i}$ only depends on $Y_{i-1}$ (conditioned on $X$), forward and backward probabilities can be clearly defined; but for CRF, since $Y_i$ depends on both $Y_{i-1}$ and $Y_{i+1}$ (conditioned on $X$), we can only have forward *vectors* and backward *vectors*, which are just formal definitions which looks like probablities but actually not.
+
+Denote the $m$ possible values of $y$ by $y^{(1)}, y^{(2)}, \cdots, y^{(m)}$.
+
+** Forward vectors
+The forward vectors $\alpha_i(x)=[\alpha_i(y^{(1)}|x), \alpha_i(y^{(2)}|x),\cdots,\alpha_i(y^{(m)}|x)]^T$ are defined by:
+\begin{align*}
+\alpha_0(y_{0}|x)=\mathbf{1}_{\{ y_0=\text{start}  \}},\ \alpha^T_i(x)=\alpha^{T}_{i-1}(x) M_i(x).
+\end{align*}
+With this definition and by induction, we have
+\begin{align*}
+  \alpha_i(y_i|x)&=\sum_{y_{i-1}}\alpha_{i-1}(y_{i-1}|x)M_i(y_{i-1},y_i|x)\\
+  &=\sum_{y_1,y_2,\cdots,y_{i-1}} \Pi^i_{j=1}M_j(y_{j-1},y_j|x).
+\end{align*}
+Formaly, if we take for granted that $Y_{i}$ only depends on $Y_{i-1}$ (forward direction), then $M$ looks like the probability transition matrix and $\alpha$ looks like the forward probability. Though this is not true in general, we can use this intuition to help thinking. Moreover, we will see in next part that this kind of forward _vector_ is very useful when compute the conditional _probability_ at one node.
+
+** backward vectors
+The backward vectors $\beta_i(x)=\left[ \beta_i(y^{(1)}|x), \beta_i(y^{(2)}|x), \cdots, \beta_i(y^{(m)}|x) \right]^T$
+are defined by
+\begin{align*}
+  \beta_{n+1}(y_{n+1}|x)=\mathbf{1}_{\{ y_{n+1}=\text{stop}  \}},\ \beta_i=M_{i+1}(x) \beta_{i+1}(x).
+\end{align*}
+With this definition and by induction, we have
+\begin{align*}
+\beta_i(y_i|x)&=\sum_{y_{i+1}} M_{i+1}(y_i,y_{i+1}|x)
+  \beta_{i+1}(y_{i+1}|x)\\
+  &=\sum_{y_{i+1},y_{i+2}, \cdots,y_n} \Pi_{j=i+1}^{n+1}  M_{j+1}(y_j,y_{j+1}|x).
+\end{align*}
+
+* Conditional Probability
+As discussed above, forward and backward vectors looks very similar to the forward and backward probabilities and $M$ looks very similar to the probability transition matrix, even though they are in general not. But, for computation of the conditional probability, they works. Neither the forward $\alpha$ and the backward $\beta$ are probabilities, but when taking the multiplicatin of them, we will obtain the conditional probability!
+\begin{align*}
+  \mathbb{P}(Y_i=y_i|x) &=  \sum_{\substack{\text{all possible} \\
+  y_{1},y_2,\cdots,y_{i-1}, \\ y_{i+1},\cdots,y_{n}}} \Pi_{j=1}^{n+1}
+  M_j(y_{j-1},y_j|x) \frac{1}{Z(x)}\\
+  &= \frac{1}{Z(x)} \sum_{\substack{\text{all possible} \\
+  y_{1},y_2,\cdots,y_{i-1}, \\ y_{i+1},\cdots,y_{n}}}  \Pi_{j=1}^{i}
+  M_j(y_{j-1},y_j|x)  \Pi_{j=i+1}^{n+1}
+  M_j(y_{j-1},y_j|x) \\
+  &= \left( \sum_{\substack{\text{all possible} \\
+  y_{1},y_2,\cdots,y_{i-1}}}  \Pi_{j=1}^{i}
+  M_j(y_{j-1},y_j|x)   \right)\left( \sum_{\substack{\text{all possible} \\
+  y_{i+1},\cdots,y_{n}}}  \Pi_{j=i+1}^{n}
+  M_j(y_{j-1},y_j|x)   \right)\frac{1}{Z(x)}\\
+  &=\alpha_i(y_i|x)\beta_i(y_i|x)\frac{1}{Z(x)}
+\end{align*}
+The second to the last equality is very magic and important! It uses the idea of combinatorics over sum of production.
+
+* Reference
+Hang Li, Statistical Learning Method.
+
+
