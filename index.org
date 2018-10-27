@@ -1,5 +1,5 @@
 #+TITLE: Index
 
-This is the home page of Jing Liu.
+This is the home page of .
 
-This blog is under construction. My current blog is at: https://jing1blog.blogspot.com/
+This blog is under construction. My current blog is at: 
